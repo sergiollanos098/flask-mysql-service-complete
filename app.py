@@ -24,6 +24,24 @@ with app.app_context():
 # ----------------- CUSTOMERS CRUD -----------------
 @app.route('/customers', methods=['GET'])
 def get_customers():
+    """
+    Obtener todos los clientes
+    ---
+    tags:
+      - Customers
+    responses:
+      200:
+        description: Lista de clientes
+        schema:
+          type: array
+          items:
+            properties:
+              id: {type: integer}
+              name: {type: string}
+              email: {type: string}
+              address: {type: string}
+              phone: {type: string}
+    """
     customers = Customer.query.all()
     return jsonify([{
         "id": c.id,
@@ -33,8 +51,25 @@ def get_customers():
         "phone": c.phone
     } for c in customers])
 
+
 @app.route('/customers/<int:id>', methods=['GET'])
 def get_customer(id):
+    """
+    Obtener un cliente por ID
+    ---
+    tags:
+      - Customers
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Cliente encontrado
+      404:
+        description: Cliente no encontrado
+    """
     c = Customer.query.get(id)
     if not c:
         return jsonify({"message": "Customer not found"}), 404
@@ -46,8 +81,29 @@ def get_customer(id):
         "phone": c.phone
     })
 
+
 @app.route('/customers', methods=['POST'])
 def create_customer():
+    """
+    Crear un nuevo cliente
+    ---
+    tags:
+      - Customers
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            name: {type: string}
+            email: {type: string}
+            address: {type: string}
+            phone: {type: string}
+    responses:
+      201:
+        description: Cliente creado exitosamente
+    """
     data = request.json
     new_cust = Customer(
         name=data['name'],
@@ -59,8 +115,34 @@ def create_customer():
     db.session.commit()
     return jsonify({"message": "Customer created successfully"}), 201
 
+
 @app.route('/customers/<int:id>', methods=['PUT'])
 def update_customer(id):
+    """
+    Actualizar un cliente
+    ---
+    tags:
+      - Customers
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            name: {type: string}
+            email: {type: string}
+            address: {type: string}
+            phone: {type: string}
+    responses:
+      200:
+        description: Cliente actualizado exitosamente
+      404:
+        description: Cliente no encontrado
+    """
     c = Customer.query.get(id)
     if not c:
         return jsonify({"message": "Customer not found"}), 404
@@ -72,8 +154,25 @@ def update_customer(id):
     db.session.commit()
     return jsonify({"message": "Customer updated successfully"})
 
+
 @app.route('/customers/<int:id>', methods=['DELETE'])
 def delete_customer(id):
+    """
+    Eliminar un cliente
+    ---
+    tags:
+      - Customers
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Cliente eliminado exitosamente
+      404:
+        description: Cliente no encontrado
+    """
     c = Customer.query.get(id)
     if not c:
         return jsonify({"message": "Customer not found"}), 404
@@ -81,9 +180,27 @@ def delete_customer(id):
     db.session.commit()
     return jsonify({"message": "Customer deleted successfully"})
 
+
 # ----------------- INVOICES CRUD -----------------
 @app.route('/invoices', methods=['GET'])
 def get_invoices():
+    """
+    Obtener todas las facturas
+    ---
+    tags:
+      - Invoices
+    responses:
+      200:
+        description: Lista de facturas
+        schema:
+          type: array
+          items:
+            properties:
+              id: {type: integer}
+              customer_id: {type: integer}
+              total_amount: {type: number}
+              date: {type: string}
+    """
     invoices = Invoice.query.all()
     return jsonify([{
         "id": i.id,
@@ -92,8 +209,25 @@ def get_invoices():
         "date": str(i.date)
     } for i in invoices])
 
+
 @app.route('/invoices/<int:id>', methods=['GET'])
 def get_invoice(id):
+    """
+    Obtener una factura por ID
+    ---
+    tags:
+      - Invoices
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Factura encontrada
+      404:
+        description: Factura no encontrada
+    """
     i = Invoice.query.get(id)
     if not i:
         return jsonify({"message": "Invoice not found"}), 404
@@ -104,8 +238,28 @@ def get_invoice(id):
         "date": str(i.date)
     })
 
+
 @app.route('/invoices', methods=['POST'])
 def create_invoice():
+    """
+    Crear una nueva factura
+    ---
+    tags:
+      - Invoices
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            customer_id: {type: integer}
+            total_amount: {type: number}
+            date: {type: string, example: "2025-09-26"}
+    responses:
+      201:
+        description: Factura creada exitosamente
+    """
     data = request.json
     new_inv = Invoice(
         customer_id=data['customer_id'],
@@ -116,8 +270,33 @@ def create_invoice():
     db.session.commit()
     return jsonify({"message": "Invoice created successfully"}), 201
 
+
 @app.route('/invoices/<int:id>', methods=['PUT'])
 def update_invoice(id):
+    """
+    Actualizar una factura
+    ---
+    tags:
+      - Invoices
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+      - in: body
+        name: body
+        schema:
+          type: object
+          properties:
+            customer_id: {type: integer}
+            total_amount: {type: number}
+            date: {type: string, example: "2025-09-26"}
+    responses:
+      200:
+        description: Factura actualizada exitosamente
+      404:
+        description: Factura no encontrada
+    """
     i = Invoice.query.get(id)
     if not i:
         return jsonify({"message": "Invoice not found"}), 404
@@ -129,14 +308,32 @@ def update_invoice(id):
     db.session.commit()
     return jsonify({"message": "Invoice updated successfully"})
 
+
 @app.route('/invoices/<int:id>', methods=['DELETE'])
 def delete_invoice(id):
+    """
+    Eliminar una factura
+    ---
+    tags:
+      - Invoices
+    parameters:
+      - name: id
+        in: path
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Factura eliminada exitosamente
+      404:
+        description: Factura no encontrada
+    """
     i = Invoice.query.get(id)
     if not i:
         return jsonify({"message": "Invoice not found"}), 404
     db.session.delete(i)
     db.session.commit()
     return jsonify({"message": "Invoice deleted successfully"})
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)

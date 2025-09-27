@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  flask-service:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mysql-db
+    environment:
+      - MYSQL_URI=mysql://root:root@mysql-db:3306/shopdb
+
+  mysql-db:
+    image: mysql:8
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: shopdb
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+volumes:
+  mysql-data:
